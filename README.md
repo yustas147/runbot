@@ -13,3 +13,8 @@ Runbot CLA addon
 
 The `runbot_cla/` directory contains an Odoo addon that checks CLA.
 
+runbot restore database
+-----------------------
+
+The `runbot_restore_db/` directory contains an Odoo addon that test your builds 
+on a restored database, to use know datas instead of demo ones
