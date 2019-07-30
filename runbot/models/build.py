@@ -742,7 +742,7 @@ class runbot_build(models.Model):
         return commit._source_path('openerp', *path)
 
     def _get_available_modules(self, commit):
-        for manifest_file_name in commit.repo.manifest_files.split(','):  # '__manifest__.py' '__openerp__.py'
+        for manifest_file_name in (commit.repo.manifest_files or '').split(','):  # '__manifest__.py' '__openerp__.py'
             for addons_path in (commit.repo.addons_paths or '').split(','):  # '' 'addons' 'odoo/addons'
                 sep = os.path.join(addons_path, '*')
                 for manifest_path in glob.glob(commit._source_path(sep, manifest_file_name)):
