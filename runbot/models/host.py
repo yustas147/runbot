@@ -22,6 +22,7 @@ class RunboHost(models.Model):
     last_exception = fields.Char('Last exception')
     exception_count = fields.Integer('Exception count')
     psql_conn_count = fields.Integer('SQL connections count', default=0)
+    testing_build_ids = fields.One2many('runbot.build', compute='_compute_testing_build_ids', store=False)
 
     def _compute_nb(self):
         groups = self.env['runbot.build'].read_group(
@@ -36,6 +37,9 @@ class RunboHost(models.Model):
         for host in self:
             host.nb_testing = count_by_host_state[host.name].get('testing', 0)
             host.nb_running = count_by_host_state[host.name].get('running', 0)
+
+    def _compute_testing_build_ids(self):
+        self.testing_build_ids = self.env['runbot.build'].search([('local_state', '=', 'testing'), ('host', '=', self.name)])
 
     @api.model
     def create(self, values):

@@ -21,6 +21,20 @@
                         <field name="last_exception" readonly='1'/>
                         <field name="exception_count" readonly='1'/>
                     </group>
+                    <notebook>
+                      <page string="Testing Builds">
+                        <field name="testing_build_ids" nolabel="1" widget="many2many" options="{'not_delete': True, 'no_create': True}">
+                          <tree>
+                            <field name="create_date"/>
+                            <field name="id"/>
+                            <field name="repo_id"/>
+                            <field name="branch_id"/>
+                            <field name="dest"/>
+                            <field name="build_url" widget="url" readonly="1" text="View build"/>
+                          </tree>
+                        </field>
+                      </page>
+                    </notebook>
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" widget="mail_followers"/>
@@ -39,6 +53,8 @@
                 <field name="disp_name"/>
                 <field name="assigned_only"/>
                 <field name="nb_worker"/>
+                <field name="nb_testing"/>
+                <field name="nb_running"/>
             </tree>
         </field>
     </record>
@@ -50,7 +66,7 @@
     </record>
 
     <menuitem
-        name="Build Hosts" 
+        name="Build Hosts"
         id="runbot_menu_host_tree"
         parent="runbot_menu_root"
         sequence="32"
