@@ -372,7 +372,7 @@ class ConfigStep(models.Model):
         return docker_run(cmd.build(), log_path, build._path(), build._get_docker_name(), cpu_limit=timeout, ro_volumes=exports, env_variables=env_variables)
 
     def log_end(self, build):
-        if self.job_type == 'create_build':
+        if not self._is_docker_step():
             build._logger('Step %s finished in %s' % (self.name, s2human(build.job_time)))
             return
 
