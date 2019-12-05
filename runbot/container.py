@@ -133,6 +133,7 @@ def docker_run(run_cmd, log_path, build_dir, container_name, exposed_ports=None,
     # create start script
     docker_command = [
         'docker', 'run', '--rm',
+        '-d',
         '--name', container_name,
         '--volume=/var/run/postgresql:/var/run/postgresql',
         '--volume=%s:/data/build' % build_dir,
@@ -164,7 +165,8 @@ def docker_run(run_cmd, log_path, build_dir, container_name, exposed_ports=None,
         docker_command.extend(['--ulimit', 'cpu=%s' % int(cpu_limit)])
     docker_command.extend(['odoo:runbot_tests', '/bin/bash', '-c', "%s" % run_cmd])
     docker_run = subprocess.Popen(docker_command, stdout=logs, stderr=logs, preexec_fn=preexec_fn, close_fds=False, cwd=build_dir)
-    _logger.info('Started Docker container %s', container_name)
+    (container_id, _) = docker_run.communicate()
+    _logger.info('Started Docker container %s (%s)', (container_name, container_id))
     return docker_run.pid
 
 def docker_stop(container_name):
