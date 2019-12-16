@@ -157,7 +157,6 @@ class Build(models.Model):
             odoo_cmd += ['-i', modules_to_install]
         elif self.state == 'migrate':
             odoo_cmd += ['-u', 'all',
-                         '--upgrades-paths', '/data/build/migration_scripts',
                          '--db-filter=^%s$' % db_name,
                          '--log-handler=:INFO', '--log-handler=odoo.models.schema:INFO', '--log-handler=odoo.modules.loading:DEBUG',
                          '--log-handler=odoo.modules.graph:CRITICAL', '--log-handler=odoo.modules.migration:DEBUG', ' --log-handler=odoo.tools.misc:INFO',
