@@ -30,6 +30,7 @@ class Build(models.Model):
 
     _name = "runbot_migra.build"
     _description = "Migration build"
+    _order = "addon"
 
     name = fields.Char('Name', required=True)
     addon = fields.Char('Addon', required=True)

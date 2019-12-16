@@ -102,7 +102,11 @@ class Project(models.Model):
             if not git_dir.endswith('.git'):
                 git_dir = os.path.join(git_dir, '.git')
             cmd = ['git', '--git-dir=%s' % git_dir, 'rev-parse', 'HEAD']
-            return subprocess.check_output(cmd, stderr=subprocess.STDOUT).decode()
+            try:
+                res = subprocess.check_output(cmd, stderr=subprocess.STDOUT).decode()
+            except subprocess.CalledProcessError:
+                res = 'Not a git dir'
+            return res
 
         self.ensure_one()
         hashes = {}
