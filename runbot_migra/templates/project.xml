@@ -32,13 +32,22 @@
         <section class="row">
           <h2>Project <t t-esc="project.name"/></h2>
             <section>
-              <h3>Hashes</h3>
-              <dl class="row small">
-                <t t-foreach="hashes" t-as="hash">
-                  <dt class="col-sm-3"><t t-esc="'/'.join(hash.split('/')[-2:])"/></dt>
-                  <dd class="col-sm-9"><t t-esc="hashes[hash]"/></dd>
-                </t>
-              </dl>
+              <div class="row">
+                <div class="col-sm-6">
+                  <h3>Hashes</h3>
+                  <dl class="row small">
+                    <t t-foreach="hashes" t-as="hash">
+                      <dt class="col-sm-3"><t t-esc="'/'.join(hash.split('/')[-2:])"/></dt>
+                      <dd class="col-sm-9"><t t-esc="hashes[hash]"/></dd>
+                    </t>
+                  </dl>
+                </div>
+                <div class="col-sm-6">
+                  <h3>Results</h3>
+                  <p class="text-success">Successful builds: <t t-esc=" project.build_ids.search_count([('result', '=', 'ok')])"/></p>
+                  <p class="text-danger">Failed builds: <t t-esc=" project.build_ids.search_count([('result', '=', 'ko')])"/></p>
+                </div>
+              </div>
             </section>
             <t t-foreach="project.build_ids" t-as="build">
               <t t-set="klass"></t>
