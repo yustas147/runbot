@@ -30,7 +30,7 @@
       <t t-call="website.layout">
        <div class="container-fluid">
         <section class="row">
-          <h2>Project <t t-esc="project.name"/></h2>
+          <h2>Project <t t-esc="project.name"/>&amp;nbsp;<small>(<t t-esc="project.migration_scripts_branch"/>)</small></h2>
             <section>
               <div class="row">
                 <div class="col-sm-6">
