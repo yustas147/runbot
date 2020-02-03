@@ -112,6 +112,7 @@ class ConfigStep(models.Model):
     flamegraph = fields.Boolean('Allow Flamegraph', default=False, track_visibility='onchange')
     test_enable = fields.Boolean('Test enable', default=True, track_visibility='onchange')
     test_tags = fields.Char('Test tags', help="comma separated list of test tags", track_visibility='onchange')
+    data_tags = fields.Char('Data tags', help="comma separated list of data tags", track_visibility='onchange', default='demo')
     enable_auto_tags = fields.Boolean('Allow auto tag', default=False, track_visibility='onchange')
     extra_params = fields.Char('Extra cmd args', track_visibility='onchange')
     additionnal_env = fields.Char('Extra env', help='Example: foo="bar",bar="foo". Cannot contains \' ', track_visibility='onchange')
@@ -361,6 +362,7 @@ class ConfigStep(models.Model):
                     cmd.extend(['--test-tags', test_tags])
             else:
                 build._log('test_all', 'Test tags given but not supported')
+
         elif self.enable_auto_tags and self.test_enable:
             if grep(config_path, "[/module][:class]"):
                 auto_tags = self.env['runbot.build.error'].disabling_tags()
@@ -370,6 +372,11 @@ class ConfigStep(models.Model):
 
         if grep(config_path, "--screenshots"):
             cmd.add_config_tuple('screenshots', '/data/build/tests')
+
+        if grep(config_path, "--without-demo") and not self.data_tags:
+            cmd.append('--without-demo=1')
+        elif grep(config_path, "data") and self.data_tags:
+            cmd.append('--data=%s' % self.data_tags)
 
         cmd.append('--stop-after-init')  # install job should always finish
         if '--log-level' not in extra_params:
