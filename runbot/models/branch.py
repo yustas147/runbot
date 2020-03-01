@@ -198,7 +198,10 @@ class runbot_branch(models.Model):
             if coverage_config:
                 vals['config_id'] = coverage_config
 
-        return super(runbot_branch, self).create(vals)
+        branch = super(runbot_branch, self).create(vals)
+        if not self.env['runbot.branch_group'].search([('name', '=', branch.pull_branch_name)]):
+            self.env['runbot.branch_group'].create({'name': branch.pull_branch_name})
+        return branch
 
     def _get_last_coverage_build(self):
         """ Return the last build with a coverage value > 0"""

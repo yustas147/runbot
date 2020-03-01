@@ -1,0 +1,56 @@
+<odoo>
+  <data>
+    <record id="branch_group_form" model="ir.ui.view">
+        <field name="name">runbot.branch_group.form</field>
+        <field name="model">runbot.branch_group</field>
+        <field name="arch" type="xml">
+          <form>
+            <sheet>
+              <group name="branch_group_group">
+                <field name="name"/>
+              </group>
+              <notebook>
+                <page string="Branches">
+                  <field name="branch_ids" nolabel="1" widget="many2many" options="{'not_delete': True, 'no_create': True}">
+                    <tree>
+                      <field name="repo_id"/>
+                      <field name="name"/>
+                      <field name="branch_name"/>
+                      <field name="sticky"/>
+                      <field name="state"/>
+                      <field name="branch_url" widget="url" readonly="1"/>
+                    </tree>
+                  </field>
+                </page>
+              </notebook>
+            </sheet>
+          </form>
+        </field>
+    </record>
+
+
+    <record id="branch_group_view_tree" model="ir.ui.view">
+        <field name="name">runbot.branch_group.tree</field>
+        <field name="model">runbot.branch_group</field>
+        <field name="arch" type="xml">
+            <tree string="Branch Groups">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="open_view_branch_group_tree" model="ir.actions.act_window">
+        <field name="name">Branch Group</field>
+        <field name="res_model">runbot.branch_group</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem
+        name="Branch Groups"
+        id="runbot_menu_branch_group_tree"
+        parent="runbot_menu_root"
+        sequence="21"
+        action="open_view_branch_group_tree"
+        />
+  </data>
+</odoo>

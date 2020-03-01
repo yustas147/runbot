@@ -6,7 +6,7 @@
     'author': "Odoo SA",
     'website': "http://runbot.odoo.com",
     'category': 'Website',
-    'version': '4.9',
+    'version': '4.10',
     'depends': ['website', 'base'],
     'data': [
         'security/runbot_security.xml',
@@ -15,6 +15,7 @@
         'views/assets.xml',
         'views/repo_views.xml',
         'views/branch_views.xml',
+        'views/branch_group_views.xml',
         'views/build_views.xml',
         'views/host_views.xml',
         'views/build_error_views.xml',
