@@ -132,6 +132,7 @@ class ConfigStep(models.Model):
         cmd += ['&&', 'mv %s/filestore/* %s' % (folder_to_restore, folder_to_restore)]
         # 2. dump.sql is restored to {db_name}
         cmd += ['&&', 'psql -a %s < %s/%s' % (db_name, folder_to_restore, 'dump.sql')]
+        cmd += ['&&', 'rm -rf %s' % folder_to_restore]
         return docker_run(' '.join(cmd), log_path, build._path(), build._get_docker_name(), ro_volumes=restore_volumes)
 
     def _upgrade_db(self, build, log_path):
