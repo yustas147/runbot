@@ -35,7 +35,7 @@ class runbot_repo(models.Model):
     custom_config_template = fields.Text('Custom configuration',
                                          help="This config will be placed in a text file, behind the [option] line, and passed with a -c to the jobs.")
     forced_branch_ids =  fields.One2many('runbot.forced.branch', 'repo_id', string='Replacing branch names')
-
+    template_db_name = fields.Char(string='Template database')
 
 class runbot_forced_branch(models.Model):
     _name = "runbot.forced.branch"
