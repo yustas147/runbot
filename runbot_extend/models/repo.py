@@ -22,6 +22,7 @@ class runbot_repo(models.Model):
     _inherit = "runbot.repo"
 
     no_build = fields.Boolean(default=False)
+    is_restore = fields.Boolean('Restore database')
     restored_db = fields.Binary(string='Database to restore (zip)', help='Zip file containing an sql dump and a filestore', attachment=True)
     restored_db_filename = fields.Char()
     use_requirements_txt = fields.Boolean('Use requirements.txt', default=True,
