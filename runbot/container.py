@@ -143,9 +143,9 @@ def _docker_run(run_cmd, log_path, build_dir, container_name, exposed_ports=None
         cmd_object = Command([], run_cmd.split(' '), [])
     _logger.debug('Docker run command: %s', run_cmd)
     logs = open(log_path, 'w')
-    open(os.path.join(build_dir, 'exist-%s' % container_name), 'w+').close()
     run_cmd = 'cd /data/build;touch start-%s;%s;cd /data/build;touch end-%s' % (container_name, run_cmd, container_name)
     docker_clear_state(container_name, build_dir)  # ensure that no state are remaining
+    open(os.path.join(build_dir, 'exist-%s' % container_name), 'w+').close()
     logs.write("Docker command:\n%s\n=================================================\n" % cmd_object)
     # create start script
     docker_command = [
