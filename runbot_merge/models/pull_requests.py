@@ -10,6 +10,7 @@ import json
 import logging
 import os
 import pprint
+import random
 import re
 import time
 
@@ -831,6 +832,8 @@ class PullRequests(models.Model):
         rebase+/-
           Whether the PR should be rebased-and-merged (the default) or just
           merged normally.
+        black
+          Replies with an random insult.
         """
         assert self, "parsing commands must be executed in an actual PR"
 
@@ -985,6 +988,11 @@ class PullRequests(models.Model):
                     ok = True
                 else:
                     msg = f"You are not allowed to override this status."
+            elif command == 'black':
+                msg = random.choice([
+                    f"Arrete tes conneries bordel! J'en veux pas de ton extension à la con!",
+                    f"LE TEST EST ROUGE BORDEL!",
+                ])
             else:
                 # ignore unknown commands
                 continue
