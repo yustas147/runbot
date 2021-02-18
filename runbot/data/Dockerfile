@@ -72,7 +72,7 @@ RUN curl -sSL http://nightly.odoo.com/odoo.key | apt-key add - \
 # Install extra debian dependencies (needs for some repos)
 RUN set -x ; \
     apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libmagic1 libzbar0 \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libmagic1 libzbar0 python3-lasso \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Odoo generic dependencies
