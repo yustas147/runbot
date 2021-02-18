@@ -49,6 +49,12 @@ RUN curl -sSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
     && DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql-client-12 \
     && rm -rf /var/lib/apt/lists/*
 
+# Install phantomjs
+RUN curl -sSL https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2  -o /tmp/phantomjs.tar.bz2 \
+    && tar xvfO /tmp/phantomjs.tar.bz2 phantomjs-2.1.1-linux-x86_64/bin/phantomjs > /usr/local/bin/phantomjs \
+    && chmod +x /usr/local/bin/phantomjs \
+    && rm -f /tmp/phantomjs.tar.bz2
+
 # Install Google Chrome
 RUN curl -sSL http://nightly.odoo.com/odoo.key | apt-key add - \
     && echo "deb http://nightly.odoo.com/deb/bionic ./" > /etc/apt/sources.list.d/google-chrome.list \
