@@ -63,6 +63,12 @@ RUN curl -sSL http://nightly.odoo.com/odoo.key | apt-key add - \
     && apt-get install -y -qq google-chrome-stable=80.0.3987.116-1 \
     && rm -rf /var/lib/apt/lists/*
 
+# Install extra debian dependencies (needs for some repos)
+RUN set -x ; \
+    apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libmagic1 libzbar0 \
+    && rm -rf /var/lib/apt/lists/*
+
 ADD https://raw.githubusercontent.com/odoo/odoo/master/requirements.txt /root/requirements.txt
 RUN python3 -m pip install setuptools wheel && \
     python3 -m pip install --no-cache-dir -r /root/requirements.txt && \
