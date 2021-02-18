@@ -39,6 +39,7 @@ RUN apt-get update \
        | awk '/^ [a-z]/ { gsub(/,/,"") ; print }' | sort -u \
        | egrep -v 'postgresql-client' \
        | sed 's/python-imaging/python-pil/'| sed 's/python-pypdf/python-pypdf2/' \
+       | sed -r 's/(python[3]?)-docutils/docutils-common \1-roman/' \
        | DEBIAN_FRONTEND=noninteractive xargs apt-get install -y -qq \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
