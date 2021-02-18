@@ -23,9 +23,10 @@ RUN curl -sSL https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.
 
 # Install nodejs
 RUN curl -sSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - \
-    && echo "deb https://deb.nodesource.com/node_15.x `lsb_release -c -s` main" > /etc/apt/sources.list.d/nodesource.list \
+    && echo "deb https://deb.nodesource.com/node_8.x stretch main" > /etc/apt/sources.list.d/nodesource.list \
     && apt-get update \
-    && apt-get install -y nodejs
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN npm install -g rtlcss es-check
 
