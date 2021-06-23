@@ -275,6 +275,8 @@ class Batch(models.Model):
                 continue
             # in any case, search for an existing build
             config = config_by_trigger.get(trigger.id, trigger.config_id)
+            if not config:
+                continue  # allow a trigger with an empty config
 
             params_value = {
                 'version_id':  version_id,
