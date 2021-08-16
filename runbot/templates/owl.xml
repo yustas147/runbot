@@ -1,5 +1,5 @@
 <data>
-    <template name="BRANCH_INFOS_XML">
+    <template id="BRANCH_INFOS_XML">
         <button t-attf-class="btn btn-default btn-ssm" data-toggle="dropdown" title="Github links" aria-label="Github links" aria-expanded="false">
             
             <i t-attf-class="fa fa-github {{bundle.branch_ids.some((branch) => branch.is_pr &amp;&amp; branch.alive) ? 'text-primary' : ''}}"/>
@@ -13,7 +13,7 @@
         </div>
     </template>
 
-    <template name="LOAD_INFOS_XML">
+    <template id="LOAD_INFOS_XML">
         <span class="pull-right">
             <span t-attf-class="badge badge-{{load_infos.pending_level}}">
                 Pending:
@@ -35,17 +35,17 @@
         </span>
     </template>
 
-    <template name="COPY_BUTTON_XML">
+    <template id="COPY_BUTTON_XML">
         <button t-attf-class="btn btn-default btn-ssm" title="Copy Bundle name" aria-label="Copy Bundle name" t-attf-onclick="copyToClipboard('{{ bundle.name }}')">
             <i t-attf-class="fa fa-clipboard"/>
         </button>
     </template>
 
 
-    <template name="BUILD_MENU_XML">
+    <template id="BUILD_MENU_XML">
         <t>
             <button t-attf-class="btn btn-default dropdown-toggle" data-toggle="dropdown" title="Build options" aria-label="Build options" aria-expanded="false">
-                <i t-attf-class="fa {{build.global_state == 'pending' ? 'fa-spinner' : 'fa-cog'}} {{['done', 'running'].indexOf(build.global_state) == -1 ? '' : 'fa-spin'}} fa-fw"/>
+                <i t-attf-class="fa {{build.global_state == 'pending' ? 'fa-spinner' : 'fa-cog'}} {{['done', 'running'].indexOf(build.global_state) == -1 ? 'fa-spin' : ''}} fa-fw"/>
                 <span class="caret"/>
             </button>
             <div class="dropdown-menu dropdown-menu-right" role="menu">
@@ -123,8 +123,8 @@
         </t>
     </template>
 
-    <template name="SLOT_BUTTON_XML">
-        <div t-attf-class="btn-group btn-group-ssm slot_button_group">
+    <template id="SLOT_BUTTON_XML">
+        <div t-attf-class="btn-group btn-group-ssm slot_button_group slot_trigger_{{slot.trigger_id.id}}">
             <span t-attf-class="btn btn-{{color}} disabled" t-att-title="slot.link_type">
                 <i t-attf-class="fa fa-{{slot.fa_link_type}} fa-fw"/>
             </span>
@@ -143,7 +143,7 @@
     </template>
         
 
-    <template name="BATCH_TILE_XML">
+    <template id="BATCH_TILE_XML">
         <div t-attf-class="batch_tile {{options.more? 'more' : 'nomore'}}">
             <div t-attf-class="card bg-{{klass}}-light">
                 <div class="batch_header">
@@ -181,7 +181,7 @@
         </div>
     </template>
 
-    <template name="BUNDLES_XML">
+    <template id="BUNDLES_XML">
         <div>
             <div
                 t-foreach="props.bundles"
@@ -230,7 +230,7 @@
         </div>
     </template>
 
-    <template name="APP_XML">
+    <template id="APP_XML">
         <div>
             <header>
                 <nav class="navbar navbar-expand-md navbar-light bg-light">
@@ -310,7 +310,7 @@
                     </div>
                 </nav>
             </header>
-            <div class="container-fluid d-none" t-ref="settings_menu">
+            <div class="container-fluid" t-ref="settings_menu">
                 <div class="row">
                     <!--div class="form-group col-md-6">
                         <h5>Search options</h5>

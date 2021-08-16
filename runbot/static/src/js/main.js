@@ -314,7 +314,7 @@ const APP_XML = `
         </nav>
     </header>
 
-    <div class="container-fluid" t-ref="settings_menu">
+    <div class="container-fluid d-none" t-ref="settings_menu">
         <div class="row">
             <!--div class="form-group col-md-6">
                 <h5>Search options</h5>
