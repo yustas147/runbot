@@ -462,7 +462,11 @@ class App extends Component {
                 res.bundles.map((bundle) => bundle.last_category_batch).forEach(
                     (di) => Object.keys(di).forEach(function(key){
                         if (self.category_custom_views[di[key]] === undefined) {
-                            batch_ids.push(di[key])
+                            if (di[key] === false) {
+                                self.category_custom_views[di[key]] = false
+                            } else {
+                                batch_ids.push(di[key])
+                            }
                         }
                     })
                 );
