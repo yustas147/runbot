@@ -71,10 +71,7 @@ class Runbot(models.AbstractModel):
         reserved_slots = self.env['runbot.build'].search_count(domain_host + [('local_state', 'in', ('testing', 'pending'))])
         assignable_slots = (nb_worker - reserved_slots)
         if assignable_slots > 0:
-            allocated = self._allocate_builds(host, assignable_slots, domain)
-            if allocated:
-
-                _logger.info('Builds %s where allocated to runbot', allocated)
+            self._allocate_builds(host, assignable_slots, domain)
 
     def _get_builds_to_init(self, host):
         domain_host = self.build_domain_host(host)
@@ -125,6 +122,7 @@ class Runbot(models.AbstractModel):
         where_clause, where_params = e.to_sql()
 
         # self-assign to be sure that another runbot batch cannot self assign the same builds
+        self.env.cr.commit()
         query = """UPDATE
                         runbot_build
                     SET
@@ -142,7 +140,6 @@ class Runbot(models.AbstractModel):
                         )
                     RETURNING id""" % where_clause
         self.env.cr.execute(query, [host.name] + where_params + [nb_slots])
-        return self.env.cr.fetchall()
 
     def _domain(self):
         return self.env.get('ir.config_parameter').get_param('runbot.runbot_domain', fqdn())
