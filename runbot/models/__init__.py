@@ -12,6 +12,7 @@ from . import database
 from . import dockerfile
 from . import event
 from . import host
+from . import hook_queue
 from . import ir_cron
 from . import ir_ui_view
 from . import project
