@@ -25,6 +25,24 @@ class TestHookQueue(RunbotCase):
 
 class TestHookController(HttpCase):
 
+    def setUp(self):
+        super().setUp()
+        self.project = self.env['runbot.project'].create({'name': 'Tests'})
+        self.repo_server = self.env['runbot.repo'].create({
+            'name': 'server',
+            'project_id': self.project.id,
+            'server_files': 'server.py',
+            'addons_paths': 'addons,core/addons'
+        })
+
+        self.remote_server = self.env['runbot.remote'].create({
+            'name': 'bla@example.com:base/server',
+            'repo_id': self.repo_server.id,
+            'token': '123',
+        })
+
     def test_hook_controller(self):
-        res = self.url_open('/runbot/hook/')
+
+        res = self.url_open(f'/runbot/hook/{self.remote_server.id}')
         print(res)
+        import pdb; pdb.set_trace()

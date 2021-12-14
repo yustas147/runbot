@@ -30,8 +30,8 @@ class Hook(http.Controller):
 
         remote = request.env['runbot.remote'].sudo().browse([remote_id])
 
-        self.env['runbot.hook.queue'].create({
-            'payload': payload,
+        request.env['runbot.hook.queue'].sudo().create({
+            'payload': json.dumps(payload),
             'remote_id': remote.id
         })
 
