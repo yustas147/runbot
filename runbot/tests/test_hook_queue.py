@@ -1,3 +1,5 @@
+import json
+
 from odoo.tests.common import HttpCase
 
 from .common import RunbotCase
@@ -43,5 +45,26 @@ class TestHookController(HttpCase):
 
     def test_hook_controller(self):
 
-        res = self.url_open(f'/runbot/hook/{self.remote_server.id}')
+        test_data = { 'payload' : r"""
+            {
+                "action": "opened",
+                "number": 12345,
+                "pull_request": {
+                    "url": "https://www.example.com/repos/odoo/odoo/pulls/12345",
+                    "number": 12345,
+                    "state": "open",
+                    "title": "[IMP]: Example request",
+                    "user": { "login": "marcel" }
+                }
+            }
+        """
+        }
+
+        res = self.url_open(f'/runbot/hook/{self.remote_server.id}', data=test_data, headers={'X-Github-Event': 'pull_request'})
         self.assertEqual(res.status_code, 200)
+
+        latest_hook = self.env['runbot.hook.queue'].search([], limit=1)
+        self.assertTrue(latest_hook.exists())
+        self.assertEqual(latest_hook.payload, json.loads(test_data['payload']))
+        self.assertEqual(latest_hook.payload.get('pull_request').get('number'), 12345)
+        self.assertEqual(latest_hook.github_event, 'pull_request')

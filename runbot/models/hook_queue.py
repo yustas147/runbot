@@ -21,6 +21,7 @@ class Json(fields._String):
 class HookQueue(models.Model):
     _name = 'runbot.hook.queue'
     _description = "Queue of received hooks"
+    _order = 'id desc, create_date desc'
 
     payload = Json(help="Json content received from github")
     remote_id = fields.Many2one('runbot.remote')
