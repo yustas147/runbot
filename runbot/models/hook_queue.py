@@ -24,3 +24,4 @@ class HookQueue(models.Model):
 
     payload = Json(help="Json content received from github")
     remote_id = fields.Many2one('runbot.remote')
+    github_event = fields.Char('Github Event')

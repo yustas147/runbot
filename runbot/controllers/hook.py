@@ -16,22 +16,13 @@ class Hook(http.Controller):
     def hook(self, remote_id=None, **_post):
         event = request.httprequest.headers.get("X-Github-Event")
         payload = json.loads(request.params.get('payload', '{}'))
-        if remote_id is None:
-            repo_data = payload.get('repository')
-            if repo_data and event in ['push', 'pull_request']:
-                remote_domain = [
-                    '|', '|', ('name', '=', repo_data['ssh_url']),
-                    ('name', '=', repo_data['clone_url']),
-                    ('name', '=', repo_data['clone_url'].rstrip('.git')),
-                ]
-                remote = request.env['runbot.remote'].sudo().search(
-                    remote_domain, limit=1)
-                remote_id = remote.id
-
         remote = request.env['runbot.remote'].sudo().browse([remote_id])
+        if not remote:
+            return
 
         request.env['runbot.hook.queue'].sudo().create({
             'payload': json.dumps(payload),
+            'github_event': event,
             'remote_id': remote.id
         })
 

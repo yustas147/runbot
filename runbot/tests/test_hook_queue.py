@@ -44,5 +44,4 @@ class TestHookController(HttpCase):
     def test_hook_controller(self):
 
         res = self.url_open(f'/runbot/hook/{self.remote_server.id}')
-        print(res)
-        import pdb; pdb.set_trace()
+        self.assertEqual(res.status_code, 200)
