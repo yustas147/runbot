@@ -41,9 +41,6 @@ access_runbot_host_manager,runbot_host_manager,runbot.model_runbot_host,runbot.g
 access_runbot_error_log_user,runbot_error_log_user,runbot.model_runbot_error_log,group_user,1,0,0,0
 access_runbot_error_log_manager,runbot_error_log_manager,runbot.model_runbot_error_log,runbot.group_runbot_admin,1,1,1,1
 
-access_runbot_repo_hooktime,runbot_repo_hooktime,runbot.model_runbot_repo_hooktime,group_user,1,0,0,0
-access_runbot_repo_referencetime,runbot_repo_referencetime,runbot.model_runbot_repo_reftime,group_user,1,0,0,0
-
 access_runbot_build_stat_user,runbot_build_stat_user,runbot.model_runbot_build_stat,group_user,1,0,0,0
 access_runbot_build_stat_admin,runbot_build_stat_admin,runbot.model_runbot_build_stat,runbot.group_runbot_admin,1,1,1,1
 
@@ -115,5 +112,5 @@ access_runbot_dockerfile_admin,access_runbot_dockerfile_admin,runbot.model_runbo
 access_runbot_codeowner_admin,runbot_codeowner_admin,runbot.model_runbot_codeowner,runbot.group_runbot_admin,1,1,1,1
 access_runbot_codeowner_user,runbot_codeowner_user,runbot.model_runbot_codeowner,group_user,1,0,0,0
 
-access_runbot_hook_queue_admin,runbot_hook_queue_admin,runbot.model_runbot_hook_queue,runbot.group_runbot_admin,1,1,1,1
-access_runbot_hook_queue_user,runbot_hook_queue_user,runbot.model_runbot_hook_queue,group_user,1,0,0,0
+access_runbot_hook_admin,runbot_hook_admin,runbot.model_runbot_hook,runbot.group_runbot_admin,1,1,1,1
+access_runbot_hook_user,runbot_hook_user,runbot.model_runbot_hook,group_user,1,0,0,0

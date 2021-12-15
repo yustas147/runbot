@@ -81,7 +81,6 @@
                 <field name="server_files"/>
                 <field name="manifest_files"/>
                 <field name="addons_paths"/>
-                <field name="hook_time" groups="base.group_no_one"/>
                 <field name="mode"/>
                 <field name="forbidden_regex"/>
                 <field name="invalid_branch_message"/>

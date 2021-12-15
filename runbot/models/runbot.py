@@ -241,13 +241,14 @@ class Runbot(models.AbstractModel):
 
     def _fetch_loop_turn(self, host, pull_info_failures, default_sleep=1):
         with self.manage_host_exception(host) as manager:
-            repos = self.env['runbot.repo'].search([('mode', '!=', 'disabled')])
-            processing_batch = self.env['runbot.batch'].search([('state', 'in', ('preparing', 'ready'))], order='id asc')
-            preparing_batch = processing_batch.filtered(lambda b: b.state == 'preparing')
             self._commit()
-            for repo in repos:
+            for hook in self.env['runbot.hook'].search([]):
+                hook._process()
+            self.env['runbot.repo'].flush()
+            for repo in self.env['runbot.repo'].search([('mode', '!=', 'disabled'), ('hooked', '=', True)]):
                 try:
-                    repo._update_batches(force=bool(preparing_batch), ignore=pull_info_failures)
+                    repo._update_batches(ignore=pull_info_failures)
+                    repo.hooked = False
                     self._commit() # commit is mainly here to avoid to lose progression in case of fetch failure or concurrent update
                 except HTTPError as e:
                     # Sometimes a pr pull info can fail.
@@ -265,6 +266,8 @@ class Runbot(models.AbstractModel):
                     pull_info_failures[pull_number] = time.time()
                     self.warning('Pr pull info failed for %s', pull_number)
                     self._commit()
+
+            processing_batch = self.env['runbot.batch'].search([('state', 'in', ('preparing', 'ready'))], order='id asc')
 
             if processing_batch:
                 for batch in processing_batch:

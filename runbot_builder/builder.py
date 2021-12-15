@@ -7,7 +7,8 @@ _logger = logging.getLogger(__name__)
 class BuilderClient(RunbotClient):
 
     def on_start(self):
-        self.env['runbot.repo'].search([('mode', '!=', 'disabled')])._update()
+        for repo in self.env['runbot.repo'].search([('mode', '!=', 'disabled')]):
+            repo._update()
 
     def loop_turn(self):
         if self.count == 1: # cleanup at second iteration

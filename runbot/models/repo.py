@@ -234,12 +234,10 @@ class Repo(models.Model):
     sequence = fields.Integer('Sequence', tracking=True)
     path = fields.Char(compute='_get_path', string='Directory', readonly=True)
     mode = fields.Selection([('disabled', 'Disabled'),
-                             ('poll', 'Poll'),
                              ('hook', 'Hook')],
-                            default='poll',
+                            default='hook',
                             string="Mode", required=True, help="hook: Wait for webhook on /runbot/hook/<id> i.e. github push event", tracking=True)
-    hook_time = fields.Float('Last hook time', compute='_compute_hook_time')
-    last_processed_hook_time = fields.Float('Last processed hook time')
+    hooked = fields.Boolean('Webhook received')
     get_ref_time = fields.Float('Last refs db update', compute='_compute_get_ref_time')
     trigger_ids = fields.Many2many('runbot.trigger', relation='runbot_trigger_triggers', readonly=True)
     forbidden_regex = fields.Char('Forbidden regex', help="Regex that forid bundle creation if branch name is matching", tracking=True)
@@ -257,30 +255,13 @@ class Repo(models.Model):
         for repo in self:
             repo.get_ref_time = times.get(repo.id, 0)
 
-    def _compute_hook_time(self):
-        self.env.cr.execute("""
-            SELECT repo_id, time FROM runbot_repo_hooktime
-            WHERE id IN (
-                SELECT max(id) FROM runbot_repo_hooktime
-                WHERE repo_id = any(%s) GROUP BY repo_id
-            )
-        """, [self.ids])
-        times = dict(self.env.cr.fetchall())
-
-        for repo in self:
-            repo.hook_time = times.get(repo.id, 0)
-
-    def set_hook_time(self, value):
-        for repo in self:
-            self.env['runbot.repo.hooktime'].create({'time': value, 'repo_id': repo.id})
-        self.invalidate_cache()
-
     def set_ref_time(self, value):
         for repo in self:
             self.env['runbot.repo.reftime'].create({'time': value, 'repo_id': repo.id})
         self.invalidate_cache()
 
     def _gc_times(self):
+        # TODO check to remove ref_time and this NEVER USED method
         self.env.cr.execute("""
             DELETE from runbot_repo_reftime WHERE id NOT IN (
                 SELECT max(id) FROM runbot_repo_reftime GROUP BY repo_id
@@ -311,7 +292,7 @@ class Repo(models.Model):
 
     def _fetch(self, sha):
         if not self._hash_exists(sha):
-            self._update(force=True)
+            self._update()
             if not self._hash_exists(sha):
                 for remote in self.remote_ids:
                     try:
@@ -345,12 +326,13 @@ class Repo(models.Model):
             return os.path.getmtime(fname_fetch_head)
         return 0
 
-    def _get_refs(self, max_age=30, ignore=None):
+    def _get_refs(self, ignore=None):
         """Find new refs
         :return: list of tuples with following refs informations:
         name, sha, date, author, author_email, subject, committer, committer_email
         """
         self.ensure_one()
+        max_age = int(self.env['ir.config_parameter'].get_param('runbot.runbot_max_age', default=30))
         get_ref_time = round(self._get_fetch_head_time(), 4)
         if not self.get_ref_time or get_ref_time > self.get_ref_time:
             try:
@@ -459,17 +441,13 @@ class Repo(models.Model):
                 if bundle.last_batch.state == 'preparing':
                     bundle.last_batch._new_commit(branch)
 
-    def _update_batches(self, force=False, ignore=None):
+    def _update_batches(self, ignore=None):
         """ Find new commits in physical repos"""
-        updated = False
-        for repo in self:
-            if repo.remote_ids and self._update(poll_delay=30 if force else 60*5):
-                max_age = int(self.env['ir.config_parameter'].get_param('runbot.runbot_max_age', default=30))
-                ref = repo._get_refs(max_age, ignore=ignore)
-                ref_branches = repo._find_or_create_branches(ref)
-                repo._find_new_commits(ref, ref_branches)
-                updated = True
-        return updated
+        self.ensure_one()
+        self._update()
+        ref = self._get_refs(ignore=ignore)
+        ref_branches = self._find_or_create_branches(ref)
+        self._find_new_commits(ref, ref_branches)
 
     def _update_git_config(self):
         """ Update repo git config file """
@@ -488,6 +466,8 @@ class Repo(models.Model):
         """ Clone the remote repo if needed """
         self.ensure_one()
         repo = self
+        if not os.path.isdir(os.path.join(repo.path)):
+            os.makedirs(repo.path)
         if not os.path.isdir(os.path.join(repo.path, 'refs')):
             _logger.info("Initiating repository '%s' in '%s'" % (repo.name, repo.path))
             git_init = subprocess.run(['git', 'init', '--bare', repo.path], stderr=subprocess.PIPE)
@@ -496,30 +476,6 @@ class Repo(models.Model):
                 return
             self._update_git_config()
             return True
-
-    def _update_git(self, force=False, poll_delay=5*60):
-        """ Update the git repo on FS """
-        self.ensure_one()
-        repo = self
-        if not repo.remote_ids:
-            return False
-        if not os.path.isdir(os.path.join(repo.path)):
-            os.makedirs(repo.path)
-        force = self._git_init() or force
-
-        fname_fetch_head = os.path.join(repo.path, 'FETCH_HEAD')
-        if not force and os.path.isfile(fname_fetch_head):
-            fetch_time = os.path.getmtime(fname_fetch_head)
-            if repo.mode == 'hook':
-                if not repo.hook_time or (repo.last_processed_hook_time and repo.hook_time <= repo.last_processed_hook_time):
-                    return False
-                repo.last_processed_hook_time = repo.hook_time
-            if repo.mode == 'poll':
-                if (time.time() < fetch_time + poll_delay):
-                    return False
-
-        _logger.info('Updating repo %s', repo.name)
-        return self._update_fetch_cmd()
 
     def _update_fetch_cmd(self):
         # Extracted from update_git to be easily overriden in external module
@@ -544,13 +500,18 @@ class Repo(models.Model):
                     host.disable()
         return success
 
-    def _update(self, force=False, poll_delay=5*60):
+    def _update(self):
         """ Update the physical git reposotories on FS"""
-        for repo in self:
-            try:
-                return repo._update_git(force, poll_delay)
-            except Exception:
-                _logger.exception('Fail to update repo %s', repo.name)
+        self.ensure_one()
+        try:
+            repo = self
+            if not repo.remote_ids:
+                return False
+            self._git_init()
+            _logger.info('Updating repo %s', repo.name)
+            return self._update_fetch_cmd()
+        except Exception:
+            _logger.exception('Fail to update repo %s', repo.name)
 
 class RefTime(models.Model):
     _name = 'runbot.repo.reftime'
@@ -558,13 +519,4 @@ class RefTime(models.Model):
     _log_access = False
 
     time = fields.Float('Time', index=True, required=True)
-    repo_id = fields.Many2one('runbot.repo', 'Repository', required=True, ondelete='cascade')
-
-
-class HookTime(models.Model):
-    _name = 'runbot.repo.hooktime'
-    _description = "Repo hooktime"
-    _log_access = False
-
-    time = fields.Float('Time')
     repo_id = fields.Many2one('runbot.repo', 'Repository', required=True, ondelete='cascade')

@@ -304,7 +304,7 @@ class TestRepo(RunbotCaseMinimalSetup):
             self.assertEqual(repo1[field_name], 1.3)
             self.assertEqual(repo2[field_name], 1.4)
 
-        _test_times('runbot.repo.hooktime', 'set_hook_time', 'hook_time')
+        # _test_times('runbot.repo.hooktime', 'set_hook_time', 'hook_time')
         _test_times('runbot.repo.reftime', 'set_ref_time', 'get_ref_time')
 
 

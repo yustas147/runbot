@@ -16,30 +16,24 @@ class Hook(http.Controller):
     def hook(self, remote_id=None, **_post):
         event = request.httprequest.headers.get("X-Github-Event")
         payload = json.loads(request.params.get('payload', '{}'))
-        remote = request.env['runbot.remote'].sudo().browse([remote_id])
+        if remote_id is None:
+            repo_data = payload.get('repository')
+            if repo_data and event in ['push', 'pull_request']:
+                remote_domain = [
+                    '|', '|', ('name', '=', repo_data['ssh_url']),
+                    ('name', '=', repo_data['clone_url']),
+                    ('name', '=', repo_data['clone_url'].rstrip('.git')),
+                ]
+                remote = request.env['runbot.remote'].sudo().search(
+                    remote_domain, limit=1)
+                remote_id = remote.id
         if not remote:
             return
 
         request.env['runbot.hook.queue'].sudo().create({
-            'payload': json.dumps(payload),
+            'payload': payload,
             'github_event': event,
             'remote_id': remote.id
         })
 
-        # force update of dependencies too in case a hook is lost
-        # if not payload or event == 'push':
-        #     remote.repo_id.set_hook_time(time.time())
-        # elif event == 'pull_request':
-        #     pr_number = payload.get('pull_request', {}).get('number', '')
-        #     branch = request.env['runbot.branch'].sudo().search([('remote_id', '=', remote.id), ('name', '=', pr_number)])
-        #     branch.recompute_infos(payload.get('pull_request', {}))
-        #     if payload.get('action') in ('synchronize', 'opened', 'reopened'):
-        #         remote.repo_id.set_hook_time(time.time())
-            # remaining recurrent actions: labeled, review_requested, review_request_removed
-        # elif event == 'delete':
-        #     if payload.get('ref_type') == 'branch':
-        #         branch_ref = payload.get('ref')
-        #         _logger.info('Branch %s in repo %s was deleted', branch_ref, remote.repo_id.name)
-        #         branch = request.env['runbot.branch'].sudo().search([('remote_id', '=', remote.id), ('name', '=', branch_ref)])
-        #         branch.alive = False
         return ""
