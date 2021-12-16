@@ -267,11 +267,6 @@ class Repo(models.Model):
                 SELECT max(id) FROM runbot_repo_reftime GROUP BY repo_id
             )
         """)
-        self.env.cr.execute("""
-            DELETE from runbot_repo_hooktime WHERE id NOT IN (
-                SELECT max(id) FROM runbot_repo_hooktime GROUP BY repo_id
-            )
-        """)
 
     @api.depends('name')
     def _get_path(self):
